@@ -32,7 +32,9 @@ import { useOrders, useCreateOrder, useUpdateOrderStatus, Order } from "@/hooks/
 import { useMerchandise } from "@/hooks/useMerchandise";
 import { useLaundryServices } from "@/hooks/useLaundryServices";
 import { useCustomers } from "@/hooks/useCustomers";
-import { Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { useNotifyPickup } from "@/hooks/useNotifyPickup";
+import { formatCurrency } from "@/lib/currency";
+import { Plus, ShoppingCart, Trash2, Mail } from "lucide-react";
 import { format } from "date-fns";
 
 const statusColors: Record<string, string> = {
@@ -60,6 +62,7 @@ export default function OrdersPage() {
   const { data: customers = [] } = useCustomers();
   const createOrder = useCreateOrder();
   const updateStatus = useUpdateOrderStatus();
+  const notifyPickup = useNotifyPickup();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [orderType, setOrderType] = useState<"merchandise" | "laundry" | "mixed">("merchandise");
@@ -130,6 +133,30 @@ export default function OrdersPage() {
 
   const subtotal = items.reduce((sum, item) => sum + item.total, 0);
 
+  const handleNotifyPickup = (order: Order) => {
+    if (!order.customers?.email) {
+      return;
+    }
+    
+    notifyPickup.mutate({
+      orderId: order.id,
+      customerEmail: order.customers.email,
+      customerName: order.customers.name,
+      orderNumber: order.order_number,
+    });
+  };
+
+  const handleStatusChange = (order: Order, newStatus: Order["status"]) => {
+    updateStatus.mutate({ id: order.id, status: newStatus }, {
+      onSuccess: () => {
+        // Auto-notify when status changes to "ready"
+        if (newStatus === "ready" && order.customers?.email) {
+          handleNotifyPickup(order);
+        }
+      }
+    });
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -193,12 +220,12 @@ export default function OrdersPage() {
                         {orderType === "laundry" 
                           ? laundryServices.map((s) => (
                               <SelectItem key={s.id} value={s.id}>
-                                {s.name} - ${s.price_per_unit}/{s.unit_type}
+                                {s.name} - {formatCurrency(s.price_per_unit)}/{s.unit_type}
                               </SelectItem>
                             ))
                           : merchandise.map((m) => (
                               <SelectItem key={m.id} value={m.id}>
-                                {m.name} - ${m.unit_price} ({m.quantity} in stock)
+                                {m.name} - {formatCurrency(m.unit_price)} ({m.quantity} in stock)
                               </SelectItem>
                             ))
                         }
@@ -233,8 +260,8 @@ export default function OrdersPage() {
                           <TableRow key={index}>
                             <TableCell>{item.description}</TableCell>
                             <TableCell className="text-right">{item.quantity}</TableCell>
-                            <TableCell className="text-right">${item.unit_price.toFixed(2)}</TableCell>
-                            <TableCell className="text-right">${item.total.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(item.unit_price)}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(item.total)}</TableCell>
                             <TableCell>
                               <Button
                                 type="button"
@@ -247,9 +274,9 @@ export default function OrdersPage() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        <TableRow>
-                          <TableCell colSpan={3} className="font-medium">Subtotal</TableCell>
-                          <TableCell className="text-right font-bold">${subtotal.toFixed(2)}</TableCell>
+                          <TableRow>
+                            <TableCell colSpan={3} className="font-medium">Subtotal</TableCell>
+                            <TableCell className="text-right font-bold">{formatCurrency(subtotal)}</TableCell>
                           <TableCell></TableCell>
                         </TableRow>
                       </TableBody>
@@ -317,26 +344,39 @@ export default function OrdersPage() {
                       <TableCell>
                         <Badge className={statusColors[order.status]}>{order.status}</Badge>
                       </TableCell>
-                      <TableCell className="text-right font-medium">${order.total.toFixed(2)}</TableCell>
+                      <TableCell className="text-right font-medium">{formatCurrency(order.total)}</TableCell>
                       <TableCell className="text-muted-foreground">
                         {format(new Date(order.created_at), "MMM d, h:mm a")}
                       </TableCell>
                       <TableCell>
-                        <Select 
-                          value={order.status} 
-                          onValueChange={(status) => updateStatus.mutate({ id: order.id, status: status as Order["status"] })}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="processing">Processing</SelectItem>
-                            <SelectItem value="ready">Ready</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Select 
+                            value={order.status} 
+                            onValueChange={(status) => handleStatusChange(order, status as Order["status"])}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">Pending</SelectItem>
+                              <SelectItem value="processing">Processing</SelectItem>
+                              <SelectItem value="ready">Ready</SelectItem>
+                              <SelectItem value="completed">Completed</SelectItem>
+                              <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {order.status === "ready" && order.customers?.email && (
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleNotifyPickup(order)}
+                              disabled={notifyPickup.isPending}
+                              title="Send pickup notification"
+                            >
+                              <Mail className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

@@ -22,6 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useMerchandise, useAddMerchandise, useDeleteMerchandise } from "@/hooks/useMerchandise";
 import { useUserRole } from "@/hooks/useUserRole";
+import { formatCurrency } from "@/lib/currency";
 import { Plus, Package, Trash2, Search } from "lucide-react";
 
 export default function MerchandisePage() {
@@ -223,7 +224,7 @@ export default function MerchandisePage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        ${item.unit_price.toFixed(2)}
+                        {formatCurrency(item.unit_price)}
                       </TableCell>
                       {isAdmin && (
                         <TableCell className="text-right">

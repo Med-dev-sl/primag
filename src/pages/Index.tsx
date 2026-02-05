@@ -5,13 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { useOrders } from "@/hooks/useOrders";
 import { useMerchandise } from "@/hooks/useMerchandise";
 import { useReceipts } from "@/hooks/useReceipts";
+import { formatCurrency } from "@/lib/currency";
 import { 
   Package, 
   ShoppingCart, 
-  Receipt, 
-  DollarSign,
   Clock,
-  CheckCircle
+  CheckCircle,
+  TrendingUp
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -52,8 +52,8 @@ const Index = () => {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard
             title="Total Revenue"
-            value={`$${totalRevenue.toFixed(2)}`}
-            icon={<DollarSign className="h-5 w-5 text-primary" />}
+            value={formatCurrency(totalRevenue)}
+            icon={<TrendingUp className="h-5 w-5 text-primary" />}
             description="All time earnings"
           />
           <StatsCard
@@ -109,7 +109,7 @@ const Index = () => {
                       <Badge className={statusColors[order.status]}>
                         {order.status}
                       </Badge>
-                      <span className="font-semibold">${order.total.toFixed(2)}</span>
+                      <span className="font-semibold">{formatCurrency(order.total)}</span>
                     </div>
                   </div>
                 ))}
