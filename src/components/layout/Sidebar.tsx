@@ -8,7 +8,9 @@ import {
   Users,
   LogOut,
   Shield,
-  BarChart3
+  BarChart3,
+  Wallet,
+  Landmark
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +26,8 @@ const navigation = [
   { name: "Customers", href: "/customers", icon: Users },
   { name: "Receipts", href: "/receipts", icon: Receipt },
   { name: "Reports", href: "/reports", icon: BarChart3 },
+  { name: "Expenses", href: "/expenses", icon: Wallet },
+  { name: "Cash to Bank", href: "/cash-to-bank", icon: Landmark },
 ];
 
 export function Sidebar() {
