@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      cash_to_bank: {
+        Row: {
+          account_number: string | null
+          amount: number
+          bank_name: string
+          created_at: string
+          id: string
+          notes: string | null
+          reference_number: string | null
+          transfer_date: string
+        }
+        Insert: {
+          account_number?: string | null
+          amount: number
+          bank_name: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reference_number?: string | null
+          transfer_date?: string
+        }
+        Update: {
+          account_number?: string | null
+          amount?: number
+          bank_name?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reference_number?: string | null
+          transfer_date?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           address: string | null
@@ -38,6 +71,39 @@ export type Database = {
           id?: string
           name?: string
           phone?: string | null
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          description: string
+          expense_date: string
+          id: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          description: string
+          expense_date?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          description?: string
+          expense_date?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

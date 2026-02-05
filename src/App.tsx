@@ -12,6 +12,8 @@ import OrdersPage from "./pages/Orders";
 import CustomersPage from "./pages/Customers";
 import ReceiptsPage from "./pages/Receipts";
 import ReportsPage from "./pages/Reports";
+import ExpensesPage from "./pages/Expenses";
+import CashToBankPage from "./pages/CashToBank";
 import AdminPage from "./pages/Admin";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
@@ -36,6 +38,8 @@ const App = () => (
             <Route path="/customers" element={<ProtectedRoute><CustomersPage /></ProtectedRoute>} />
             <Route path="/receipts" element={<ProtectedRoute><ReceiptsPage /></ProtectedRoute>} />
             <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
+            <Route path="/expenses" element={<ProtectedRoute><ExpensesPage /></ProtectedRoute>} />
+            <Route path="/cash-to-bank" element={<ProtectedRoute><CashToBankPage /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
