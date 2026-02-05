@@ -6,9 +6,11 @@ import {
   ShoppingCart, 
   Receipt, 
   Users,
-  Settings
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -21,6 +23,7 @@ const navigation = [
 
 export function Sidebar() {
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar">
@@ -58,12 +61,22 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="border-t border-sidebar-border p-4">
-          <div className="flex items-center gap-3 text-sidebar-foreground/60">
-            <Settings className="h-4 w-4" />
-            <span className="text-xs">v1.0.0</span>
-          </div>
+        {/* Footer with user info and logout */}
+        <div className="border-t border-sidebar-border p-4 space-y-3">
+          {user && (
+            <div className="px-2">
+              <p className="text-xs text-sidebar-foreground/60">Logged in as</p>
+              <p className="text-sm text-sidebar-foreground truncate">{user.email}</p>
+            </div>
+          )}
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+            onClick={signOut}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign Out
+          </Button>
         </div>
       </div>
     </aside>
