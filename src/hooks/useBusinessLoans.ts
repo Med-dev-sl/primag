@@ -63,7 +63,15 @@ export function useBusinessLoans() {
     }) => {
       const { data, error } = await supabase
         .from("business_loans")
-        .insert({ ...loan, balance: loan.amount })
+        .insert({ 
+          lender_name: loan.lender_name,
+          amount: loan.amount,
+          balance: loan.amount,
+          interest_rate: loan.interest_rate || null,
+          reason: loan.reason || null,
+          loan_date: loan.loan_date,
+          due_date: loan.due_date || null,
+        })
         .select()
         .single();
       if (error) throw error;
