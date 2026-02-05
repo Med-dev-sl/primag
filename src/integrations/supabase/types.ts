@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_loan_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          loan_id: string
+          notes: string | null
+          payment_date: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          loan_id: string
+          notes?: string | null
+          payment_date?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          loan_id?: string
+          notes?: string | null
+          payment_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_loan_payments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "business_loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_loans: {
+        Row: {
+          amount: number
+          balance: number
+          created_at: string
+          due_date: string | null
+          id: string
+          interest_rate: number | null
+          lender_name: string
+          loan_date: string
+          reason: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          balance: number
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          interest_rate?: number | null
+          lender_name: string
+          loan_date?: string
+          reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          balance?: number
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          interest_rate?: number | null
+          lender_name?: string
+          loan_date?: string
+          reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cash_to_bank: {
         Row: {
           account_number: string | null
@@ -46,6 +123,133 @@ export type Database = {
           transfer_date?: string
         }
         Relationships: []
+      }
+      customer_credits: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_id: string
+          id: string
+          order_id: string | null
+          reason: string | null
+          redeemed_at: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_id: string
+          id?: string
+          order_id?: string | null
+          reason?: string | null
+          redeemed_at?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_id?: string
+          id?: string
+          order_id?: string | null
+          reason?: string | null
+          redeemed_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_credits_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_credits_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_loan_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          loan_id: string
+          notes: string | null
+          payment_date: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          loan_id: string
+          notes?: string | null
+          payment_date?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          loan_id?: string
+          notes?: string | null
+          payment_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_loan_payments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "customer_loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_loans: {
+        Row: {
+          amount: number
+          balance: number
+          created_at: string
+          customer_id: string
+          id: string
+          loan_date: string
+          reason: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          balance: number
+          created_at?: string
+          customer_id: string
+          id?: string
+          loan_date?: string
+          reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          balance?: number
+          created_at?: string
+          customer_id?: string
+          id?: string
+          loan_date?: string
+          reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_loans_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customers: {
         Row: {
