@@ -3,12 +3,16 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import MerchandisePage from "./pages/Merchandise";
 import LaundryPage from "./pages/Laundry";
 import OrdersPage from "./pages/Orders";
 import CustomersPage from "./pages/Customers";
 import ReceiptsPage from "./pages/Receipts";
+import LoginPage from "./pages/Login";
+import SignupPage from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,15 +23,19 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/merchandise" element={<MerchandisePage />} />
-          <Route path="/laundry" element={<LaundryPage />} />
-          <Route path="/orders" element={<OrdersPage />} />
-          <Route path="/customers" element={<CustomersPage />} />
-          <Route path="/receipts" element={<ReceiptsPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/merchandise" element={<ProtectedRoute><MerchandisePage /></ProtectedRoute>} />
+            <Route path="/laundry" element={<ProtectedRoute><LaundryPage /></ProtectedRoute>} />
+            <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+            <Route path="/customers" element={<ProtectedRoute><CustomersPage /></ProtectedRoute>} />
+            <Route path="/receipts" element={<ProtectedRoute><ReceiptsPage /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
