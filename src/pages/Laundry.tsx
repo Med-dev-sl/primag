@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useLaundryServices, useAddLaundryService } from "@/hooks/useLaundryServices";
+import { formatCurrency } from "@/lib/currency";
 import { Plus, Shirt } from "lucide-react";
 
 export default function LaundryPage() {
@@ -160,7 +161,7 @@ export default function LaundryPage() {
                         <Badge variant="secondary">{service.unit_type}</Badge>
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        ${service.price_per_unit.toFixed(2)} / {service.unit_type}
+                        {formatCurrency(service.price_per_unit)} / {service.unit_type}
                       </TableCell>
                     </TableRow>
                   ))

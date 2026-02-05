@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { useReceipts, useCreateReceipt } from "@/hooks/useReceipts";
 import { useOrders, useOrderWithItems } from "@/hooks/useOrders";
+import { formatCurrency } from "@/lib/currency";
 import { Receipt, Printer, Share2, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -91,11 +92,11 @@ Date: ${format(new Date(selectedOrder.created_at), "MMM d, yyyy h:mm a")}
 ${selectedOrder.customers ? `Customer: ${selectedOrder.customers.name}` : "Walk-in Customer"}
 
 Items:
-${selectedOrder.items?.map(item => `- ${item.description} x${item.quantity}: $${item.total.toFixed(2)}`).join("\n")}
+${selectedOrder.items?.map(item => `- ${item.description} x${item.quantity}: ${formatCurrency(item.total)}`).join("\n")}
 
-Subtotal: $${selectedOrder.subtotal.toFixed(2)}
-Tax (10%): $${selectedOrder.tax.toFixed(2)}
-Total: $${selectedOrder.total.toFixed(2)}
+Subtotal: ${formatCurrency(selectedOrder.subtotal)}
+Tax (10%): ${formatCurrency(selectedOrder.tax)}
+Total: ${formatCurrency(selectedOrder.total)}
 
 Thank you for your business!
     `.trim();
@@ -147,7 +148,7 @@ Thank you for your business!
                   <SelectContent>
                     {pendingOrders.map((order) => (
                       <SelectItem key={order.id} value={order.id}>
-                        {order.order_number} - ${order.total.toFixed(2)}
+                        {order.order_number} - {formatCurrency(order.total)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -158,7 +159,7 @@ Thank you for your business!
                 <>
                   <div className="rounded-lg bg-muted p-4 space-y-1">
                     <p className="text-sm text-muted-foreground">Order Total</p>
-                    <p className="text-2xl font-bold">${selectedPendingOrder.total.toFixed(2)}</p>
+                    <p className="text-2xl font-bold">{formatCurrency(selectedPendingOrder.total)}</p>
                   </div>
 
                   <div className="space-y-2">
@@ -189,7 +190,7 @@ Thank you for your business!
 
                   {amountPaid >= selectedPendingOrder.total && (
                     <div className="rounded-lg bg-success/10 p-4">
-                      <p className="text-sm text-success">Change to give: ${(amountPaid - selectedPendingOrder.total).toFixed(2)}</p>
+                      <p className="text-sm text-success">Change to give: {formatCurrency(amountPaid - selectedPendingOrder.total)}</p>
                     </div>
                   )}
                 </>
@@ -261,7 +262,7 @@ Thank you for your business!
                         <TableRow key={item.id}>
                           <TableCell>{item.description}</TableCell>
                           <TableCell className="text-right">{item.quantity}</TableCell>
-                          <TableCell className="text-right">${item.total.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">{formatCurrency(item.total)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -271,15 +272,15 @@ Thank you for your business!
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal</span>
-                    <span>${selectedOrder.subtotal.toFixed(2)}</span>
+                    <span>{formatCurrency(selectedOrder.subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Tax (10%)</span>
-                    <span>${selectedOrder.tax.toFixed(2)}</span>
+                    <span>{formatCurrency(selectedOrder.tax)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span>${selectedOrder.total.toFixed(2)}</span>
+                    <span>{formatCurrency(selectedOrder.total)}</span>
                   </div>
                 </div>
 
@@ -328,7 +329,7 @@ Thank you for your business!
                       <TableCell>{receipt.orders?.customers?.name || "Walk-in"}</TableCell>
                       <TableCell className="capitalize">{receipt.payment_method}</TableCell>
                       <TableCell className="text-right font-medium">
-                        ${receipt.amount_paid.toFixed(2)}
+                        {formatCurrency(receipt.amount_paid)}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {format(new Date(receipt.issued_at), "MMM d, h:mm a")}
