@@ -11,6 +11,7 @@ import LaundryPage from "./pages/Laundry";
 import OrdersPage from "./pages/Orders";
 import CustomersPage from "./pages/Customers";
 import ReceiptsPage from "./pages/Receipts";
+import AdminPage from "./pages/Admin";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
             <Route path="/customers" element={<ProtectedRoute><CustomersPage /></ProtectedRoute>} />
             <Route path="/receipts" element={<ProtectedRoute><ReceiptsPage /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

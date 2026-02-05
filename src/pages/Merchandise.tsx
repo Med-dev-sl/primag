@@ -21,12 +21,14 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useMerchandise, useAddMerchandise, useDeleteMerchandise } from "@/hooks/useMerchandise";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Plus, Package, Trash2, Search } from "lucide-react";
 
 export default function MerchandisePage() {
   const { data: merchandise = [], isLoading } = useMerchandise();
   const addMerchandise = useAddMerchandise();
   const deleteMerchandise = useDeleteMerchandise();
+  const { isAdmin } = useUserRole();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -179,19 +181,19 @@ export default function MerchandisePage() {
                   <TableHead>SKU</TableHead>
                   <TableHead className="text-right">Quantity</TableHead>
                   <TableHead className="text-right">Unit Price</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  {isAdmin && <TableHead className="text-right">Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-8">
                       Loading...
                     </TableCell>
                   </TableRow>
                 ) : filteredMerchandise.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-8">
                       <Package className="mx-auto h-12 w-12 text-muted-foreground/50" />
                       <p className="mt-2 text-muted-foreground">No items found</p>
                     </TableCell>
@@ -223,15 +225,17 @@ export default function MerchandisePage() {
                       <TableCell className="text-right font-medium">
                         ${item.unit_price.toFixed(2)}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteMerchandise.mutate(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </TableCell>
+                      {isAdmin && (
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteMerchandise.mutate(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 )}

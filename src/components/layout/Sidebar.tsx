@@ -6,11 +6,14 @@ import {
   ShoppingCart, 
   Receipt, 
   Users,
-  LogOut
+  LogOut,
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -24,6 +27,7 @@ const navigation = [
 export function Sidebar() {
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useUserRole();
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar">
@@ -59,13 +63,36 @@ export function Sidebar() {
               </NavLink>
             );
           })}
+
+          {/* Admin Link - only visible to admins */}
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 mt-4 border-t border-sidebar-border pt-4",
+                location.pathname === "/admin"
+                  ? "bg-sidebar-accent text-sidebar-primary"
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+              )}
+            >
+              <Shield className="h-5 w-5" />
+              Admin Panel
+            </NavLink>
+          )}
         </nav>
 
         {/* Footer with user info and logout */}
         <div className="border-t border-sidebar-border p-4 space-y-3">
           {user && (
             <div className="px-2">
-              <p className="text-xs text-sidebar-foreground/60">Logged in as</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-sidebar-foreground/60">Logged in as</p>
+                {isAdmin && (
+                  <Badge className="text-[10px] px-1.5 py-0 bg-destructive/20 text-destructive border-destructive/30">
+                    Admin
+                  </Badge>
+                )}
+              </div>
               <p className="text-sm text-sidebar-foreground truncate">{user.email}</p>
             </div>
           )}
