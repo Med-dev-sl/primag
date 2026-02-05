@@ -10,7 +10,8 @@ import {
   Shield,
   BarChart3,
   Wallet,
-  Landmark
+  Landmark,
+  HandCoins
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,6 +29,7 @@ const navigation = [
   { name: "Reports", href: "/reports", icon: BarChart3 },
   { name: "Expenses", href: "/expenses", icon: Wallet },
   { name: "Cash to Bank", href: "/cash-to-bank", icon: Landmark },
+  { name: "Loans & Credits", href: "/loans", icon: HandCoins },
 ];
 
 export function Sidebar() {
