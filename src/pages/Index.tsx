@@ -1,5 +1,6 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { StatsCard } from "@/components/dashboard/StatsCard";
+import { DashboardOverdueAlerts } from "@/components/dashboard/DashboardOverdueAlerts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useOrders } from "@/hooks/useOrders";
@@ -75,6 +76,9 @@ const Index = () => {
             description="Orders fulfilled today"
           />
         </div>
+
+        {/* Overdue Loan Alerts */}
+        <DashboardOverdueAlerts />
 
         {/* Recent Orders */}
         <Card>

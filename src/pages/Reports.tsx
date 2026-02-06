@@ -14,7 +14,8 @@ import { useBusinessLoans } from "@/hooks/useBusinessLoans";
 import { useCustomerCredits } from "@/hooks/useCustomerCredits";
 import { formatCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
-import { BarChart, TrendingUp, TrendingDown, Calendar as CalendarIcon, Wallet, Landmark, DollarSign, X } from "lucide-react";
+import { BarChart, TrendingUp, TrendingDown, Calendar as CalendarIcon, Wallet, Landmark, DollarSign, X, Download } from "lucide-react";
+import { exportReportToPDF } from "@/lib/exportPdf";
 import {
   ChartContainer,
   ChartTooltip,
@@ -252,7 +253,7 @@ export default function ReportsPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-4 md:space-y-6">
+      <div id="financial-report-content" className="space-y-4 md:space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Financial Reports</h1>
@@ -261,8 +262,17 @@ export default function ReportsPage() {
             </p>
           </div>
           
-          {/* Date Range Filter */}
+          {/* Date Range Filter & PDF Export */}
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportReportToPDF("financial-report-content", `primag-report-${format(new Date(), "yyyy-MM-dd")}.pdf`)}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Export PDF</span>
+              <span className="sm:hidden">PDF</span>
+            </Button>
             <Popover>
               <PopoverTrigger asChild>
                 <Button

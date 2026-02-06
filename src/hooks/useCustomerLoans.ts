@@ -83,19 +83,27 @@ export function useCustomerLoans() {
       
       if (!loan) throw new Error("Loan not found");
       
-      const newBalance = Number(loan.balance) - payment.amount;
+      // Simple subtraction only — no interest calculation
+      const currentBalance = Math.round(Number(loan.balance) * 100) / 100;
+      const paymentAmount = Math.round(payment.amount * 100) / 100;
+      const newBalance = Math.round((currentBalance - paymentAmount) * 100) / 100;
       
       // Insert payment
       const { error: paymentError } = await supabase
         .from("customer_loan_payments")
-        .insert(payment);
+        .insert({
+          loan_id: payment.loan_id,
+          amount: paymentAmount,
+          payment_date: payment.payment_date,
+          notes: payment.notes || null,
+        });
       if (paymentError) throw paymentError;
       
       // Update loan balance
       const { error: updateError } = await supabase
         .from("customer_loans")
         .update({ 
-          balance: newBalance,
+          balance: Math.max(0, newBalance),
           status: newBalance <= 0 ? 'paid' : 'active'
         })
         .eq("id", payment.loan_id);
