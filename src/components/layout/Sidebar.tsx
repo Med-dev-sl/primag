@@ -46,7 +46,7 @@ export function Sidebar() {
             <Package className="h-5 w-5 text-sidebar-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-sidebar-foreground">MerchLaundry</h1>
+            <h1 className="text-lg font-semibold text-sidebar-foreground">Primag Enterprise</h1>
             <p className="text-xs text-sidebar-foreground/60">Business Manager</p>
           </div>
         </div>

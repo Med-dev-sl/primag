@@ -9,6 +9,9 @@ import { useReceipts } from "@/hooks/useReceipts";
 import { useOrders } from "@/hooks/useOrders";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useCashToBank } from "@/hooks/useCashToBank";
+import { useCustomerLoans } from "@/hooks/useCustomerLoans";
+import { useBusinessLoans } from "@/hooks/useBusinessLoans";
+import { useCustomerCredits } from "@/hooks/useCustomerCredits";
 import { formatCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 import { BarChart, TrendingUp, TrendingDown, Calendar as CalendarIcon, Wallet, Landmark, DollarSign, X } from "lucide-react";
@@ -42,6 +45,9 @@ import {
   endOfDay,
 } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { LoanSummaryCards } from "@/components/reports/LoanSummaryCards";
+import { OverdueAlerts } from "@/components/reports/OverdueAlerts";
+import { PaymentHistory } from "@/components/reports/PaymentHistory";
 
 type TimeRange = "daily" | "weekly" | "monthly";
 
@@ -50,6 +56,9 @@ export default function ReportsPage() {
   const { data: orders = [] } = useOrders();
   const { expenses } = useExpenses();
   const { transfers } = useCashToBank();
+  const { loans: customerLoans, payments: customerPayments } = useCustomerLoans();
+  const { loans: businessLoans, payments: businessPayments } = useBusinessLoans();
+  const { credits } = useCustomerCredits();
   const [timeRange, setTimeRange] = useState<TimeRange>("daily");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
@@ -192,6 +201,10 @@ export default function ReportsPage() {
   const completedOrders = filteredOrders.filter((o) => o.status === "completed").length;
   const laundryOrders = filteredOrders.filter((o) => o.order_type === "laundry").length;
   const merchandiseOrders = filteredOrders.filter((o) => o.order_type === "merchandise").length;
+
+  // Loan & credit summaries
+  const totalCreditsOwed = credits.filter((c) => c.status === "pending").reduce((sum, c) => sum + Number(c.amount), 0);
+  const pendingCreditsCount = credits.filter((c) => c.status === "pending").length;
 
   // Expense breakdown by category
   const expenseByCategory = filteredExpenses.reduce((acc, exp) => {
@@ -526,6 +539,25 @@ export default function ReportsPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Overdue Alerts */}
+        <OverdueAlerts businessLoans={businessLoans} />
+
+        {/* Loan Summary */}
+        <LoanSummaryCards
+          customerLoans={customerLoans}
+          businessLoans={businessLoans}
+          totalCreditsOwed={totalCreditsOwed}
+          pendingCreditsCount={pendingCreditsCount}
+        />
+
+        {/* Payment History */}
+        <PaymentHistory
+          customerLoans={customerLoans}
+          customerPayments={customerPayments}
+          businessLoans={businessLoans}
+          businessPayments={businessPayments}
+        />
       </div>
     </MainLayout>
   );
