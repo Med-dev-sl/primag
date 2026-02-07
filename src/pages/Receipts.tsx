@@ -46,14 +46,15 @@ export default function ReceiptsPage() {
 
   const { data: selectedOrder } = useOrderWithItems(selectedReceiptOrderId);
 
-  const pendingOrders = orders.filter(o => o.status !== "completed" && o.status !== "cancelled");
-  const selectedPendingOrder = pendingOrders.find(o => o.id === selectedOrderId);
+  // Allow receipts for all orders (not just pending)
+  const eligibleOrders = orders.filter(o => o.status !== "cancelled");
+  const selectedEligibleOrder = eligibleOrders.find(o => o.id === selectedOrderId);
 
   const handleCreateReceipt = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedPendingOrder) return;
+    if (!selectedEligibleOrder) return;
 
-    const changeGiven = amountPaid - selectedPendingOrder.total;
+    const changeGiven = amountPaid - selectedEligibleOrder.total;
     if (changeGiven < 0) {
       toast.error("Amount paid is less than total");
       return;
@@ -124,7 +125,7 @@ Thank you for your business!
               Generate and manage payment receipts
             </p>
           </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)} disabled={pendingOrders.length === 0}>
+          <Button onClick={() => setIsCreateDialogOpen(true)} disabled={eligibleOrders.length === 0}>
             <Receipt className="mr-2 h-4 w-4" />
             Generate Receipt
           </Button>
@@ -144,20 +145,20 @@ Thank you for your business!
                     <SelectValue placeholder="Choose an order..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {pendingOrders.map((order) => (
+                    {eligibleOrders.map((order) => (
                       <SelectItem key={order.id} value={order.id}>
-                        {order.order_number} - {formatCurrency(order.total)}
+                        {order.order_number} - {formatCurrency(order.total)} ({order.status})
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              {selectedPendingOrder && (
+              {selectedEligibleOrder && (
                 <>
                   <div className="rounded-lg bg-muted p-4 space-y-1">
                     <p className="text-sm text-muted-foreground">Order Total</p>
-                    <p className="text-2xl font-bold">{formatCurrency(selectedPendingOrder.total)}</p>
+                    <p className="text-2xl font-bold">{formatCurrency(selectedEligibleOrder.total)}</p>
                   </div>
 
                   <div className="space-y-2">
@@ -178,7 +179,7 @@ Thank you for your business!
                     <Label>Amount Paid *</Label>
                     <Input
                       type="number"
-                      min={selectedPendingOrder.total}
+                      min={selectedEligibleOrder.total}
                       step="0.01"
                       value={amountPaid}
                       onChange={(e) => setAmountPaid(parseFloat(e.target.value) || 0)}
@@ -186,9 +187,9 @@ Thank you for your business!
                     />
                   </div>
 
-                  {amountPaid >= selectedPendingOrder.total && (
+                  {amountPaid >= selectedEligibleOrder.total && (
                     <div className="rounded-lg bg-success/10 p-4">
-                      <p className="text-sm text-success">Change to give: {formatCurrency(amountPaid - selectedPendingOrder.total)}</p>
+                      <p className="text-sm text-success">Change to give: {formatCurrency(amountPaid - selectedEligibleOrder.total)}</p>
                     </div>
                   )}
                 </>
@@ -197,7 +198,7 @@ Thank you for your business!
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={!selectedOrderId || amountPaid < (selectedPendingOrder?.total || 0) || createReceipt.isPending}
+                disabled={!selectedOrderId || amountPaid < (selectedEligibleOrder?.total || 0) || createReceipt.isPending}
               >
                 {createReceipt.isPending ? "Generating..." : "Generate Receipt"}
               </Button>

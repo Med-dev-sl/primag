@@ -34,6 +34,7 @@ import { useLaundryServices } from "@/hooks/useLaundryServices";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useNotifyPickup } from "@/hooks/useNotifyPickup";
 import { formatCurrency } from "@/lib/currency";
+import { OrderFilters } from "@/components/orders/OrderFilters";
 import { Plus, ShoppingCart, Trash2, Mail } from "lucide-react";
 import { format } from "date-fns";
 
@@ -71,6 +72,33 @@ export default function OrdersPage() {
   const [items, setItems] = useState<OrderItemInput[]>([]);
   const [selectedItem, setSelectedItem] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+
+  // Filter and sort orders
+  const filteredOrders = orders
+    .filter((order) => {
+      const matchesSearch =
+        order.order_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (order.customers?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "all" || order.status === statusFilter;
+      const matchesType = typeFilter === "all" || order.order_type === typeFilter;
+      return matchesSearch && matchesStatus && matchesType;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "oldest":
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case "total_high":
+          return b.total - a.total;
+        case "total_low":
+          return a.total - b.total;
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
 
   const addItem = () => {
     if (!selectedItem) return;
@@ -305,6 +333,18 @@ export default function OrdersPage() {
           </Dialog>
         </div>
 
+        {/* Filters */}
+        <OrderFilters
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          typeFilter={typeFilter}
+          onTypeFilterChange={setTypeFilter}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
+
         <Card>
           <CardContent className="p-0">
             <Table>
@@ -326,15 +366,15 @@ export default function OrdersPage() {
                       Loading...
                     </TableCell>
                   </TableRow>
-                ) : orders.length === 0 ? (
+                ) : filteredOrders.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8">
                       <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                      <p className="mt-2 text-muted-foreground">No orders yet</p>
+                      <p className="mt-2 text-muted-foreground">No orders found</p>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  orders.map((order) => (
+                  filteredOrders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">{order.order_number}</TableCell>
                       <TableCell>{order.customers?.name || "Walk-in"}</TableCell>

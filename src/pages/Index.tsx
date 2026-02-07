@@ -1,6 +1,7 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { DashboardOverdueAlerts } from "@/components/dashboard/DashboardOverdueAlerts";
+import { StockAlerts } from "@/components/dashboard/StockAlerts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useOrders } from "@/hooks/useOrders";
@@ -12,7 +13,8 @@ import {
   ShoppingCart, 
   Clock,
   CheckCircle,
-  TrendingUp
+  TrendingUp,
+  DollarSign,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -35,6 +37,7 @@ const Index = () => {
     const orderDate = new Date(o.created_at).toDateString();
     return orderDate === new Date().toDateString() && o.status === "completed";
   }).length;
+  const totalStockValue = merchandise.reduce((sum, m) => sum + m.unit_price * m.quantity, 0);
 
   const recentOrders = orders.slice(0, 5);
 
@@ -50,12 +53,18 @@ const Index = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <StatsCard
             title="Total Revenue"
             value={formatCurrency(totalRevenue)}
             icon={<TrendingUp className="h-5 w-5 text-primary" />}
             description="All time earnings"
+          />
+          <StatsCard
+            title="Total Stock Value"
+            value={formatCurrency(totalStockValue)}
+            icon={<DollarSign className="h-5 w-5 text-primary" />}
+            description={`${merchandise.reduce((sum, m) => sum + m.quantity, 0)} units in stock`}
           />
           <StatsCard
             title="Inventory Items"
@@ -78,7 +87,11 @@ const Index = () => {
         </div>
 
         {/* Overdue Loan Alerts */}
-        <DashboardOverdueAlerts />
+        {/* Overdue Loan Alerts & Stock Alerts */}
+        <div className="grid gap-4 lg:grid-cols-2">
+          <DashboardOverdueAlerts />
+          <StockAlerts />
+        </div>
 
         {/* Recent Orders */}
         <Card>
