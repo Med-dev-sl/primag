@@ -94,10 +94,9 @@ export function useCreateOrder() {
       // Generate order number
       const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
       
-      // Calculate totals
+      // Calculate totals — no tax or interest applied
       const subtotal = orderData.items.reduce((sum, item) => sum + item.total, 0);
-      const tax = subtotal * 0.1; // 10% tax
-      const total = subtotal + tax;
+      const total = subtotal;
       
       // Create order
       const { data: order, error: orderError } = await supabase
@@ -108,7 +107,7 @@ export function useCreateOrder() {
           customer_id: orderData.customer_id || null,
           notes: orderData.notes || null,
           subtotal,
-          tax,
+          tax: 0,
           total,
         })
         .select()
@@ -127,11 +126,31 @@ export function useCreateOrder() {
         .insert(itemsToInsert);
       
       if (itemsError) throw itemsError;
+
+      // Deduct merchandise stock for each merchandise item
+      for (const item of orderData.items) {
+        if (item.item_type === "merchandise" && item.merchandise_id) {
+          const { data: currentItem } = await supabase
+            .from("merchandise")
+            .select("quantity")
+            .eq("id", item.merchandise_id)
+            .single();
+          
+          if (currentItem) {
+            const newQty = Math.max(0, currentItem.quantity - item.quantity);
+            await supabase
+              .from("merchandise")
+              .update({ quantity: newQty })
+              .eq("id", item.merchandise_id);
+          }
+        }
+      }
       
       return order;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["merchandise"] });
       toast.success("Order created successfully");
     },
     onError: (error) => {

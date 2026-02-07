@@ -86,7 +86,7 @@ export default function ReceiptsPage() {
     if (!selectedOrder) return;
     
     const receiptText = `
-Receipt - MerchLaundry
+Receipt - Primag Enterprise
 Order: ${selectedOrder.order_number}
 Date: ${format(new Date(selectedOrder.created_at), "MMM d, yyyy h:mm a")}
 ${selectedOrder.customers ? `Customer: ${selectedOrder.customers.name}` : "Walk-in Customer"}
@@ -94,8 +94,6 @@ ${selectedOrder.customers ? `Customer: ${selectedOrder.customers.name}` : "Walk-
 Items:
 ${selectedOrder.items?.map(item => `- ${item.description} x${item.quantity}: ${formatCurrency(item.total)}`).join("\n")}
 
-Subtotal: ${formatCurrency(selectedOrder.subtotal)}
-Tax (10%): ${formatCurrency(selectedOrder.tax)}
 Total: ${formatCurrency(selectedOrder.total)}
 
 Thank you for your business!
@@ -227,7 +225,7 @@ Thank you for your business!
             {selectedOrder && (
               <div className="space-y-4 print:p-4">
                 <div className="text-center border-b pb-4">
-                  <h2 className="text-xl font-bold">MerchLaundry</h2>
+                  <h2 className="text-xl font-bold">Primag Enterprise</h2>
                   <p className="text-sm text-muted-foreground">Business Manager</p>
                 </div>
 
@@ -270,14 +268,6 @@ Thank you for your business!
                 </div>
 
                 <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal</span>
-                    <span>{formatCurrency(selectedOrder.subtotal)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Tax (10%)</span>
-                    <span>{formatCurrency(selectedOrder.tax)}</span>
-                  </div>
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
                     <span>{formatCurrency(selectedOrder.total)}</span>
