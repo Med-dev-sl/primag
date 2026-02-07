@@ -49,6 +49,8 @@ import { DateRange } from "react-day-picker";
 import { LoanSummaryCards } from "@/components/reports/LoanSummaryCards";
 import { OverdueAlerts } from "@/components/reports/OverdueAlerts";
 import { PaymentHistory } from "@/components/reports/PaymentHistory";
+import { SalesReport } from "@/components/reports/SalesReport";
+import { StockAlerts } from "@/components/dashboard/StockAlerts";
 
 type TimeRange = "daily" | "weekly" | "monthly";
 
@@ -549,6 +551,12 @@ export default function ReportsPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Sales Summary */}
+        <SalesReport receipts={receipts} />
+
+        {/* Stock Overview */}
+        <StockAlerts />
 
         {/* Overdue Alerts */}
         <OverdueAlerts businessLoans={businessLoans} />
