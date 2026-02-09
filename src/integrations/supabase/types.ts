@@ -526,6 +526,44 @@ export type Database = {
           },
         ]
       }
+      restock_history: {
+        Row: {
+          created_at: string
+          id: string
+          merchandise_id: string
+          new_quantity: number
+          notes: string | null
+          previous_quantity: number
+          quantity_added: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          merchandise_id: string
+          new_quantity: number
+          notes?: string | null
+          previous_quantity: number
+          quantity_added: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          merchandise_id?: string
+          new_quantity?: number
+          notes?: string | null
+          previous_quantity?: number
+          quantity_added?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restock_history_merchandise_id_fkey"
+            columns: ["merchandise_id"]
+            isOneToOne: false
+            referencedRelation: "merchandise"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
