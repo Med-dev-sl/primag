@@ -20,18 +20,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useMerchandise, useAddMerchandise, useDeleteMerchandise } from "@/hooks/useMerchandise";
+import { useMerchandise, useAddMerchandise, useUpdateMerchandise, useDeleteMerchandise } from "@/hooks/useMerchandise";
 import { useUserRole } from "@/hooks/useUserRole";
 import { formatCurrency } from "@/lib/currency";
-import { Plus, Package, Trash2, Search } from "lucide-react";
+import { Plus, Package, Trash2, Search, RotateCcw } from "lucide-react";
 
 export default function MerchandisePage() {
   const { data: merchandise = [], isLoading } = useMerchandise();
   const addMerchandise = useAddMerchandise();
+  const updateMerchandise = useUpdateMerchandise();
   const deleteMerchandise = useDeleteMerchandise();
   const { isAdmin } = useUserRole();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [restockItem, setRestockItem] = useState<{ id: string; name: string; quantity: number } | null>(null);
+  const [restockQty, setRestockQty] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState({
     name: "",
@@ -182,19 +185,19 @@ export default function MerchandisePage() {
                   <TableHead>SKU</TableHead>
                   <TableHead className="text-right">Quantity</TableHead>
                   <TableHead className="text-right">Unit Price</TableHead>
-                  {isAdmin && <TableHead className="text-right">Actions</TableHead>}
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-8">
+                    <TableCell colSpan={6} className="text-center py-8">
                       Loading...
                     </TableCell>
                   </TableRow>
                 ) : filteredMerchandise.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-8">
+                    <TableCell colSpan={6} className="text-center py-8">
                       <Package className="mx-auto h-12 w-12 text-muted-foreground/50" />
                       <p className="mt-2 text-muted-foreground">No items found</p>
                     </TableCell>
@@ -226,8 +229,19 @@ export default function MerchandisePage() {
                       <TableCell className="text-right font-medium">
                         {formatCurrency(item.unit_price)}
                       </TableCell>
-                      {isAdmin && (
-                        <TableCell className="text-right">
+                      <TableCell className="text-right flex items-center justify-end gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setRestockItem({ id: item.id, name: item.name, quantity: item.quantity });
+                            setRestockQty(1);
+                          }}
+                        >
+                          <RotateCcw className="mr-1 h-3 w-3" />
+                          Restock
+                        </Button>
+                        {isAdmin && (
                           <Button
                             variant="ghost"
                             size="icon"
@@ -235,8 +249,8 @@ export default function MerchandisePage() {
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
-                        </TableCell>
-                      )}
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -244,6 +258,39 @@ export default function MerchandisePage() {
             </Table>
           </CardContent>
         </Card>
+        {/* Restock Dialog */}
+        <Dialog open={!!restockItem} onOpenChange={(open) => !open && setRestockItem(null)}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Restock: {restockItem?.name}</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">Current quantity: {restockItem?.quantity}</p>
+            <div className="space-y-2">
+              <Label htmlFor="restock-qty">Quantity to add</Label>
+              <Input
+                id="restock-qty"
+                type="number"
+                min="1"
+                value={restockQty}
+                onChange={(e) => setRestockQty(parseInt(e.target.value) || 1)}
+              />
+            </div>
+            <Button
+              className="w-full"
+              disabled={updateMerchandise.isPending}
+              onClick={() => {
+                if (restockItem) {
+                  updateMerchandise.mutate(
+                    { id: restockItem.id, quantity: restockItem.quantity + restockQty },
+                    { onSuccess: () => setRestockItem(null) }
+                  );
+                }
+              }}
+            >
+              {updateMerchandise.isPending ? "Restocking..." : `Add ${restockQty} units`}
+            </Button>
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );
