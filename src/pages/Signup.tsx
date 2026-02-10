@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import AdBanner from "@/components/ads/AdBanner";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -131,6 +132,7 @@ export default function SignupPage() {
           </CardFooter>
         </form>
       </Card>
+      <AdBanner adSlot="8859292246" className="mt-6 w-full max-w-md" />
     </div>
   );
 }
